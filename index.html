@@ -8,7 +8,7 @@
 <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
 <script src="https://d3js.org/d3-geo-projection.v2.min.js"></script>
 
-<svg id="map"></svg>
+<div id="map"></div>
 
 <script>
   var height = 1000;
@@ -81,11 +81,64 @@
 
       const path = d3.geoPath(projection);
 
+      // bubble markers
+      var markers = [
+        { id: 649, lat: 38.06, long: -121.8 },
+        { id: 2, lat: 38.063333, long: -121.851667 },
+        { id: 3, lat: 38.051667, long: -121.88 },
+        { id: 4, lat: 38.048333, long: -121.935 },
+        { id: 5, lat: 38.06, long: -121.98 },
+        { id: 6, lat: 38.065, long: -122.035 },
+        { id: 7, lat: 38.048333, long: -122.096667 },
+        { id: 8, lat: 38.03, long: -122.151667 },
+        { id: 9, lat: 38.056667, long: -122.185 },
+        { id: 10, lat: 38.06, long: -122.208333 },
+        { id: 11, lat: 38.06, long: -122.266667 },
+        { id: 12, lat: 38.051667, long: -122.311667 },
+        { id: 13, lat: 38.028333, long: -122.37 },
+        { id: 14, lat: 38.006667, long: -122.405 },
+        { id: 15, lat: 37.973333, long: -122.436667 },
+        { id: 16, lat: 37.916667, long: -122.446667 },
+        { id: 17, lat: 37.878333, long: -122.421667 },
+        { id: 18, lat: 37.846667, long: -122.421667 },
+        { id: 20, lat: 37.82, long: -122.393333 },
+        { id: 21, lat: 37.788333, long: -122.358333 },
+        { id: 22, lat: 37.765, long: -122.358333 },
+        { id: 23, lat: 37.728333, long: -122.336667 },
+        { id: 24, lat: 37.698333, long: -122.338333 },
+        { id: 25, lat: 37.67, long: -122.325 },
+        { id: 26, lat: 37.636667, long: -122.313333 },
+        { id: 27, lat: 37.618333, long: -122.291667 },
+        { id: 28, lat: 37.601667, long: -122.27 },
+        { id: 29, lat: 37.58, long: -122.245 },
+        { id: 29.5, lat: 37.568333, long: -122.218333 },
+        { id: 30, lat: 37.555, long: -122.19 },
+        { id: 31, lat: 37.528333, long: -122.158333 },
+        { id: 32, lat: 37.518333, long: -122.133333 },
+        { id: 33, lat: 37.508333, long: -122.121667 },
+        { id: 34, lat: 37.495, long: -122.098333 },
+        { id: 35, lat: 37.48, long: -122.078333 },
+        { id: 36, lat: 37.471667, long: -122.066667 },
+        { id: 662, lat: 38.226667, long: 121.67 },
+        { id: 659, lat: 38.178333, long: 121.666667 },
+        { id: 655, lat: 38.121667, long: 121.701667 },
+        { id: 654, lat: 38.105, long: 121.708333 },
+        { id: 653, lat: 38.105, long: 121.72 },
+        { id: 652, lat: 38.086667, long: 121.746667 },
+        { id: 651, lat: 38.078333, long: 121.763333 },
+        { id: 650, lat: 38.071667, long: 121.775 },
+        { id: 411, lat: 38.096667, long: 122.058333 },
+        { id: 407, lat: 38.071667, long: 122.093333 },
+        { id: 405, lat: 38.048333, long: 122.123333 },
+        { id: 12.5, lat: 38.04, long: 122.315 },
+        { id: 19, lat: 37.818333, long: 122.471667 },
+        { id: 28.5, lat: 37.596667, long: 122.235 },
+      ];
+
       // construct svg
-      const svg = d3
-        .select('svg')
-        .style('width', '50%')
-        .style('height', '100%')
+      var svg = d3
+        .select('#map')
+        .append('svg')
         .attr('width', width)
         .attr('height', height)
         .call(zoom);
@@ -146,6 +199,50 @@
         .attr('fill', greys[7])
         .style('font', '7px sans-serif')
         .text((d) => d.properties.name);
+
+      // tooltip
+      var Tooltip = d3
+        .select('#map')
+        .append('div')
+        .attr('class', 'tooltip')
+        .style('position', 'absolute')
+        .style('opacity', 1)
+        .style('background-color', 'white')
+        .style('border', 'solid')
+        .style('border-width', '2px')
+        .style('border-radius', '5px')
+        .style('padding', '5px');
+
+      // tooltip hover function
+      var mouseover = function (d) {
+        Tooltip.style('opacity', 1);
+      };
+      var mousemove = function (d) {
+        Tooltip.html(
+          d.id + '<br>' + 'long: ' + d.long + '<br>' + 'lat: ' + d.lat
+        )
+          .style('left', d3.mouse(this)[0] + 10 + 'px')
+          .style('top', d3.mouse(this)[1] + 2 + 'px');
+      };
+      var mouseleave = function (d) {
+        Tooltip.style('opacity', 0);
+      };
+
+      // circles
+      g.selectAll('myCircles')
+        .data(markers)
+        .enter()
+        .append('circle')
+        .attr('cx', (d) => projection([d.long, d.lat])[0])
+        .attr('cy', (d) => projection([d.long, d.lat])[1])
+        .attr('r', 10)
+        .style('fill', '69b3a2')
+        .attr('stroke', '#69b3a2')
+        .attr('stroke-width', 3)
+        .attr('fill-opacity', 0.4)
+        .on('mouseover', mouseover)
+        .on('mousemove', mousemove)
+        .on('mouseleave', mouseleave);
     }
   );
 </script>
