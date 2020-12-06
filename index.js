@@ -151,7 +151,7 @@ d3.json(
                     .append('div')
                     .attr('class', 'tooltip')
                     .style('position', 'absolute')
-                    .style('opacity', 1)
+                    .style('visibility', 'hidden')
                     .style('background-color', 'white')
                     .style('border', 'solid')
                     .style('border-width', '2px')
@@ -160,7 +160,7 @@ d3.json(
 
                 // tooltip hover function
                 var mouseover = function (d) {
-                    Tooltip.style('opacity', 1);
+                    Tooltip.style('visibility', 'visible');
                 };
                 var mousemove = function (d) {
                     Tooltip.html(
@@ -170,7 +170,7 @@ d3.json(
                         .style('top', d3.mouse(this)[1] + 2 + 'px');
                 };
                 var mouseleave = function (d) {
-                    Tooltip.style('opacity', 0);
+                    Tooltip.style('visibility', 'hidden');
                 };
 
                 // circles
