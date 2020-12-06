@@ -1,8 +1,11 @@
-var height = 1000;
-var width = 800;
+const height = window.innerHeight - 50;
+const width = window.innerWidth - 200;
+
 const boundaryFilter = (a, b) => a !== b;
 const textOffset = { x: 0, y: 3 };
 const greys = d3.schemeGreys[9];
+
+const getColor = (oxygen, min, max) => `hsl(240, ${(oxygen - min) / (max - min) * 100}%, 50%)`;
 
 // import data
 d3.json(
@@ -73,8 +76,9 @@ d3.json(
             .row(r => ({ id: r['Station_Number'], lat: +r['Lat'], long: +r['Lng'], oxygen: +r['Oxygen'], year: +r['year'], month: +r['month'] }))
             .get((error, rows) => {
 
-                markers = rows.filter((r) => (r.year === 2000 && r.month === 5));
-                console.log(markers);
+                let markers = rows.filter((r) => (r.year === 2000 && r.month === 5));
+                const maxOxygen = Math.max(...rows.map(m => m.oxygen));
+                const minOxygen = Math.min(...rows.map(m => m.oxygen));
 
                 // construct svg
                 var svg = d3
@@ -177,10 +181,8 @@ d3.json(
                     .attr('cx', (d) => projection([d.long, d.lat])[0])
                     .attr('cy', (d) => projection([d.long, d.lat])[1])
                     .attr('r', 10)
-                    .style('fill', '69b3a2')
-                    .attr('stroke', '#69b3a2')
-                    .attr('stroke-width', 3)
-                    .attr('fill-opacity', 0.4)
+                    .style('fill', (d) => getColor(d.oxygen, minOxygen, maxOxygen))
+                    .attr('fill-opacity', 0.9)
                     .on('mouseover', mouseover)
                     .on('mousemove', mousemove)
                     .on('mouseleave', mouseleave);
