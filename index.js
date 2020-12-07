@@ -39,11 +39,15 @@ d3.json(
 
         // longitude, latitude for map frame / bounding box
 
-        var mapFrameGeoJSON = JSON.parse(
-            `{"type":"Feature",
-    "geometry":{"type":"LineString",
-    "coordinates":[[-122.539643,38.190853],[-121.691283,37.413678]]}}`
-        );
+        var mapFrameGeoJSON = {
+            type: "Feature",
+            geometry: {
+                type: "LineString",
+                coordinates: [
+                    [-122.539643, 38.190853],
+                    [-121.691283, 37.413678]]
+            }
+        };
 
         var projection = d3
             .geoConicConformal()
@@ -177,7 +181,8 @@ d3.json(
                 const mouseover = d => {
                     Tooltip.style('visibility', 'visible');
                 };
-                const mousemove = d => {
+                function mousemove(d) {
+                    console.log(d3.mouse(this))
                     Tooltip.html(
                         d.id + '<br>' + 'long: ' + d.long + '<br>' + 'lat: ' + d.lat
                     )
@@ -221,14 +226,16 @@ d3.json(
 
                 formatDate = d3.timeFormat("%b %y");
 
-                const sliderSvg = d3.select("#svg"),
-                    sliderWidth = width - margin.left - margin.right,
-                    sliderHeight = 100;
+                const sliderSvg = d3
+                    .select("#slider")
+                    .append('svg')
+                    .attr('width', width)
+                    .attr('height', 60);
 
                 // scale function
                 const x = d3.scaleTime()
                     .domain([minDate, maxDate])
-                    .range([0, sliderWidth])
+                    .range([0, width - margin.left - margin.right])
                     .clamp(true);
 
                 // initial value
@@ -237,7 +244,7 @@ d3.json(
 
                 const slider = sliderSvg.append("g")
                     .attr("class", "slider")
-                    .attr("transform", "translate(" + margin.left + "," + (sliderHeight - 60) + ")");
+                    .attr("transform", `translate(${margin.left}, ${40})`);
 
                 slider.append("line")
                     .attr("class", "track")
@@ -253,7 +260,7 @@ d3.json(
 
                 slider.insert("g", ".track-overlay")
                     .attr("class", "ticks")
-                    .attr("transform", "translate(0," + 18 + ")")
+                    .attr("transform", `translate(0, ${18})`)
                     .selectAll("text")
                     .data(x.ticks(10))
                     .enter().append("text")
