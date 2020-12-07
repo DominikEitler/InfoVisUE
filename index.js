@@ -278,6 +278,35 @@ d3.json(
                     updateBubbles(h);
                 }
 
+
+                /* ==================================================== */
+                /*                        PICKER                        */
+                /* ==================================================== */
+
+                const dat = [1, 2, 3]
+
+                const onSelectChange = () => {
+                    selectValue = d3.select('select').property('value')
+                    d3.select('body')
+                        .append('p')
+                        .text(selectValue + ' is the selected option')
+                }
+
+                var yearPicker = d3.select("#yearPicker")
+                    .append('select')
+                    .attr('class', 'select')
+                    .on('change', onSelectChange)
+
+                var options = yearPicker
+                    .selectAll('option')
+                    .data(dat).enter()
+                    .append('option')
+                    .text((d) => d);
+
+
+
+
+
             });
 
     }
