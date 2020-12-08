@@ -2,6 +2,10 @@ const height = window.innerHeight - 150;
 const width = window.innerWidth - 200;
 const margin = { right: 50, left: 50 };
 
+const labelSize = 7;
+const markerSize = 1.5;
+const bubbleSize = 10;
+
 const boundaryFilter = (a, b) => a !== b;
 const textOffset = { x: 0, y: 3 };
 const greys = d3.schemeGreys[9];
@@ -39,7 +43,7 @@ d3.json(
 
         // longitude, latitude for map frame / bounding box
 
-        var mapFrameGeoJSON = {
+        const mapFrameGeoJSON = {
             type: "Feature",
             geometry: {
                 type: "LineString",
@@ -49,7 +53,7 @@ d3.json(
             }
         };
 
-        var projection = d3
+        const projection = d3
             .geoConicConformal()
             .parallels([37 + 4 / 60, 38 + 26 / 60])
             .rotate([120 + 30 / 60], 0)
@@ -60,13 +64,16 @@ d3.json(
             projection.invert(mapFrameSpec().bottomRight),
         ];
 
-        function zoom(s) {
+        const zoom = s => {
             s.call(
                 d3
                     .zoom()
-                    .on('zoom', () =>
-                        s.select('#map-layers').attr('transform', d3.event.transform)
-                    )
+                    .on('zoom', () => {
+                        s.select('#map-layers').attr('transform', d3.event.transform);
+                        s.selectAll('.bubble').attr('r', bubbleSize / d3.event.transform.k);
+                        s.selectAll('.place-label').style('font', `${labelSize / d3.event.transform.k}px sans-serif`);
+                        s.selectAll('.places').attr('r', markerSize / d3.event.transform.k);
+                    })
                     .scaleExtent([1, 18])
                     .translateExtent([
                         [0, 0],
@@ -144,7 +151,7 @@ d3.json(
                     .classed('places', true)
                     .attr('cx', d => path.centroid(d)[0])
                     .attr('cy', d => path.centroid(d)[1])
-                    .attr('r', 1.5)
+                    .attr('r', markerSize)
                     .attr('fill', 'white')
                     .attr('stroke', greys[5])
                     .attr('stoke-width', 0.5);
@@ -165,7 +172,7 @@ d3.json(
                     .attr('y', d => path.centroid(d)[1] - textOffset.y)
                     .attr('text-anchor', 'end')
                     .attr('fill', greys[7])
-                    .style('font', '7px sans-serif')
+                    .style('font', `${labelSize}px sans-serif`)
                     .text(d => d.properties.name);
 
 
@@ -220,7 +227,7 @@ d3.json(
                         .append('circle')
                         .attr('cx', d => projection([d.long, d.lat])[0])
                         .attr('cy', d => projection([d.long, d.lat])[1])
-                        .attr('r', 10)
+                        .attr('r', bubbleSize)
                         .attr('class', 'bubble')
                         .style('fill', d => getColor(d.oxygen, minOxygen, maxOxygen))
                         .attr('fill-opacity', 0.9)
@@ -298,33 +305,33 @@ d3.json(
                 /*                     TIME-PICKER                      */
                 /* ==================================================== */
 
-                const years = [...new Set(rows.map(d => d.year))]
-                const months = [... new Set(rows.map(d => d.month))]
+                const years = [...new Set(rows.map(d => d.year))];
+                const months = [... new Set(rows.map(d => d.month))];
 
                 const onSelectChange = () => {
-                    selectedYear = d3.select('#yearSelect').property('value')
-                    selectedMonth = d3.select('#monthSelect').property('value')
-                    selectedTime = new Date(selectedYear, selectedMonth - 1) //TODO why is this 1 month off?
-                    updateData(selectedTime)
+                    selectedYear = d3.select('#yearSelect').property('value');
+                    selectedMonth = d3.select('#monthSelect').property('value');
+                    selectedTime = new Date(selectedYear, selectedMonth - 1); //TODO why is this 1 month off?
+                    updateData(selectedTime);
                 }
 
                 const monthPicker = d3.select('#timePicker')
                     .append('select')
                     .attr('class', 'select')
                     .attr('id', 'monthSelect')
-                    .on('change', onSelectChange)
+                    .on('change', onSelectChange);
 
                 const monthOptions = monthPicker
                     .selectAll('option')
                     .data(months).enter()
                     .append('option')
-                    .text((d) => d)
+                    .text((d) => d);
 
                 const yearPicker = d3.select("#timePicker")
                     .append('select')
                     .attr('class', 'select')
                     .attr('id', 'yearSelect')
-                    .on('change', onSelectChange)
+                    .on('change', onSelectChange);
 
                 const yearOptions = yearPicker
                     .selectAll('option')
