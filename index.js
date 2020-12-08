@@ -201,7 +201,7 @@ d3.json(
                 const updateBubbles = date => {
                     let markers = rows.filter(r => compareDates(r.date, date));
 
-                    g.selectAll("circle").remove();
+                    g.selectAll(".bubble").remove();
 
                     g.selectAll('myCircles')
                         .data(markers)
@@ -210,6 +210,7 @@ d3.json(
                         .attr('cx', d => projection([d.long, d.lat])[0])
                         .attr('cy', d => projection([d.long, d.lat])[1])
                         .attr('r', 10)
+                        .attr('class', 'bubble')
                         .style('fill', d => getColor(d.oxygen, minOxygen, maxOxygen))
                         .attr('fill-opacity', 0.9)
                         .on('mouseover', mouseover)
