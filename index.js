@@ -190,16 +190,18 @@ d3.json(
                 const mouseover = d => {
                     Tooltip.style('visibility', 'visible');
                 };
-                function mousemove(d) {
-                    Tooltip.html(
-                        'Station number: ' + Math.floor(d.id) +
-                        '<br>' + 'OXYSAT: ' + 'TBD'
-                    )
-                        .style('left', d3.event.pageX + 10 + 'px')
-                        .style('top', d3.event.pageY + 2 + 'px');
-                };
+
                 const mouseleave = d => {
                     Tooltip.style('visibility', 'hidden');
+                };
+
+                const mousemove = d => {
+                    Tooltip.html(
+                        `Station  ${Math.floor(d.id)} <br>
+                        Oxygen: ${d.oxygen}`
+                    )
+                        .style('left', `${d3.event.pageX + 10}px`)
+                        .style('top', `${d3.event.pageY + 2}px`);
                 };
 
 
