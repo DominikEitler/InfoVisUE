@@ -273,39 +273,52 @@ d3.json(
                     .attr("r", 10);
 
                 const updateData = h => {
-                    handle.attr("cx", x(h));
-                    console.log(formatDate(h))
+                    handle.attr('cx', x(h));
+                    console.log(formatDate(h));
                     updateBubbles(h);
-                }
+                    // set selected values in picker elements
+                    d3.select('#yearSelect').property('value', h.getFullYear());
+                    d3.select('#monthSelect').property('value', h.getMonth() + 1);
+                };
 
 
                 /* ==================================================== */
-                /*                        PICKER                        */
+                /*                     TIME-PICKER                      */
                 /* ==================================================== */
 
-                const dat = [1, 2, 3]
+                const years = [...new Set(rows.map(d => d.year))]
+                const months = [... new Set(rows.map(d => d.month))]
 
                 const onSelectChange = () => {
-                    selectValue = d3.select('select').property('value')
-                    d3.select('body')
-                        .append('p')
-                        .text(selectValue + ' is the selected option')
+                    selectedYear = d3.select('#yearSelect').property('value')
+                    selectedMonth = d3.select('#monthSelect').property('value')
+                    selectedTime = new Date(selectedYear, selectedMonth - 1) //TODO why is this 1 month off?
+                    updateData(selectedTime)
                 }
 
-                var yearPicker = d3.select("#yearPicker")
+                var monthPicker = d3.select('#timePicker')
                     .append('select')
                     .attr('class', 'select')
+                    .attr('id', 'monthSelect')
                     .on('change', onSelectChange)
 
-                var options = yearPicker
+                var monthOptions = monthPicker
                     .selectAll('option')
-                    .data(dat).enter()
+                    .data(months).enter()
+                    .append('option')
+                    .text((d) => d)
+
+                var yearPicker = d3.select("#timePicker")
+                    .append('select')
+                    .attr('class', 'select')
+                    .attr('id', 'yearSelect')
+                    .on('change', onSelectChange)
+
+                var yearOptions = yearPicker
+                    .selectAll('option')
+                    .data(years).enter()
                     .append('option')
                     .text((d) => d);
-
-
-
-
 
             });
 
