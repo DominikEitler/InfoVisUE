@@ -98,6 +98,10 @@ d3.json(
                 const maxOxygen = Math.max(...rows.map(m => m.oxygen));
                 const minOxygen = Math.min(...rows.map(m => m.oxygen));
 
+                /* ==================================================== */
+                /*                          MAP                         */
+                /* ==================================================== */
+
 
                 // construct svg
                 const mapSvg = d3
@@ -164,9 +168,14 @@ d3.json(
                     .style('font', '7px sans-serif')
                     .text(d => d.properties.name);
 
-                // tooltip
+
+                /* ==================================================== */
+                /*                        TOOLTIP                      */
+                /* ==================================================== */
+
+
                 const Tooltip = d3
-                    .select('#map')
+                    .select('body')
                     .append('div')
                     .attr('class', 'tooltip')
                     .style('position', 'absolute')
@@ -182,12 +191,12 @@ d3.json(
                     Tooltip.style('visibility', 'visible');
                 };
                 function mousemove(d) {
-                    console.log(d3.mouse(this))
                     Tooltip.html(
-                        d.id + '<br>' + 'long: ' + d.long + '<br>' + 'lat: ' + d.lat
+                        'Station number: ' + Math.floor(d.id) +
+                        '<br>' + 'OXYSAT: ' + 'TBD'
                     )
-                        .style('left', d3.mouse(this)[0] + 10 + 'px')
-                        .style('top', d3.mouse(this)[1] + 2 + 'px');
+                        .style('left', d3.event.pageX + 10 + 'px')
+                        .style('top', d3.event.pageY + 2 + 'px');
                 };
                 const mouseleave = d => {
                     Tooltip.style('visibility', 'hidden');
@@ -297,25 +306,25 @@ d3.json(
                     updateData(selectedTime)
                 }
 
-                var monthPicker = d3.select('#timePicker')
+                const monthPicker = d3.select('#timePicker')
                     .append('select')
                     .attr('class', 'select')
                     .attr('id', 'monthSelect')
                     .on('change', onSelectChange)
 
-                var monthOptions = monthPicker
+                const monthOptions = monthPicker
                     .selectAll('option')
                     .data(months).enter()
                     .append('option')
                     .text((d) => d)
 
-                var yearPicker = d3.select("#timePicker")
+                const yearPicker = d3.select("#timePicker")
                     .append('select')
                     .attr('class', 'select')
                     .attr('id', 'yearSelect')
                     .on('change', onSelectChange)
 
-                var yearOptions = yearPicker
+                const yearOptions = yearPicker
                     .selectAll('option')
                     .data(years).enter()
                     .append('option')
