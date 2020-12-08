@@ -5,6 +5,7 @@ const margin = { right: 50, left: 50 };
 const labelSize = 7;
 const markerSize = 1.5;
 const bubbleSize = 10;
+let lastZoom = 1
 
 const boundaryFilter = (a, b) => a !== b;
 const textOffset = { x: 0, y: 3 };
@@ -69,10 +70,11 @@ d3.json(
                 d3
                     .zoom()
                     .on('zoom', () => {
+                        lastZoom = d3.event.transform.k
                         s.select('#map-layers').attr('transform', d3.event.transform);
-                        s.selectAll('.bubble').attr('r', bubbleSize / d3.event.transform.k);
-                        s.selectAll('.place-label').style('font', `${labelSize / d3.event.transform.k}px sans-serif`);
-                        s.selectAll('.places').attr('r', markerSize / d3.event.transform.k);
+                        s.selectAll('.bubble').attr('r', bubbleSize / lastZoom);
+                        s.selectAll('.place-label').style('font', `${labelSize / lastZoom}px sans-serif`);
+                        s.selectAll('.places').attr('r', markerSize / lastZoom);
                     })
                     .scaleExtent([1, 18])
                     .translateExtent([
@@ -227,7 +229,7 @@ d3.json(
                         .append('circle')
                         .attr('cx', d => projection([d.long, d.lat])[0])
                         .attr('cy', d => projection([d.long, d.lat])[1])
-                        .attr('r', bubbleSize)
+                        .attr('r', bubbleSize / lastZoom)
                         .attr('class', 'bubble')
                         .style('fill', d => getColor(d.oxygen, minOxygen, maxOxygen))
                         .attr('fill-opacity', 0.9)
