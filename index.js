@@ -11,10 +11,9 @@ const boundaryFilter = (a, b) => a !== b;
 const textOffset = { x: 0, y: 3 };
 const greys = d3.schemeGreys[9];
 
-const getColor = (oxygen, min, max) => `hsl(240, ${(oxygen - min) / (max - min) * 100}%, 50%)`;
 const compareDates = (date1, date2) => date1.getMonth() == date2.getMonth() && date1.getYear() == date2.getYear();
 
-// import data
+// import map data
 d3.json(
     'https://gist.githubusercontent.com/clhenrick/4ebb009378a9ede30d3db672caeb9ff5/raw/bda4918592ff5e089ee4deb6650c4e5d70adb994/basemap_layers.json',
     function (basemapTopoJson) {
@@ -60,15 +59,9 @@ d3.json(
             .rotate([120 + 30 / 60], 0)
             .fitSize([width, height], mapFrameGeoJSON);
 
-        const mapFrameCoords = [
-            projection.invert(mapFrameSpec().upperLeft),
-            projection.invert(mapFrameSpec().bottomRight),
-        ];
-
         const zoom = s => {
             s.call(
-                d3
-                    .zoom()
+                d3.zoom()
                     .on('zoom', () => {
                         lastZoom = d3.event.transform.k
                         s.select('#map-layers').attr('transform', d3.event.transform);
@@ -86,7 +79,7 @@ d3.json(
 
         const path = d3.geoPath(projection);
 
-
+        // load data
         d3.csv("oxygen.csv")
             .row(r => ({
                 id: r['Station_Number'],
@@ -99,18 +92,25 @@ d3.json(
             }))
             .get((error, rows) => {
 
+                // general values from data
+
                 const maxDate = new Date(Math.max.apply(null, rows.map(r => r.date)));
                 const minDate = new Date(Math.min.apply(null, rows.map(r => r.date)));
 
                 const startDate = minDate;
 
+                const years = [...new Set(rows.map(d => d.year))];
+                const months = [... new Set(rows.map(d => d.month))];
+
                 const maxOxygen = Math.max(...rows.map(m => m.oxygen));
                 const minOxygen = Math.min(...rows.map(m => m.oxygen));
+
+                const bubbleColor = d3.scaleSequential(d3.interpolateBlues)
+                    .domain([minOxygen, maxOxygen]);
 
                 /* ==================================================== */
                 /*                          MAP                         */
                 /* ==================================================== */
-
 
                 // construct svg
                 const mapSvg = d3
@@ -170,7 +170,7 @@ d3.json(
                     .enter()
                     .append('text')
                     .classed('place-label', true)
-                    .attr('x', d => path.centroid(d)[0])
+                    .attr('x', d => path.centroid(d)[0] - textOffset.x)
                     .attr('y', d => path.centroid(d)[1] - textOffset.y)
                     .attr('text-anchor', 'end')
                     .attr('fill', greys[7])
@@ -181,7 +181,6 @@ d3.json(
                 /* ==================================================== */
                 /*                        TOOLTIP                      */
                 /* ==================================================== */
-
 
                 const Tooltip = d3
                     .select('body')
@@ -219,7 +218,7 @@ d3.json(
                 /* ==================================================== */
 
                 const updateBubbles = date => {
-                    let markers = rows.filter(r => compareDates(r.date, date));
+                    const markers = rows.filter(r => compareDates(r.date, date));
 
                     g.selectAll(".bubble").remove();
 
@@ -231,7 +230,7 @@ d3.json(
                         .attr('cy', d => projection([d.long, d.lat])[1])
                         .attr('r', bubbleSize / lastZoom)
                         .attr('class', 'bubble')
-                        .style('fill', d => getColor(d.oxygen, minOxygen, maxOxygen))
+                        .style('fill', d => bubbleColor(d.oxygen))
                         .attr('fill-opacity', 0.9)
                         .on('mouseover', mouseover)
                         .on('mousemove', mousemove)
@@ -245,7 +244,7 @@ d3.json(
                 /*                        SLIDER                        */
                 /* ==================================================== */
 
-                formatDate = d3.timeFormat("%b %y");
+                const formatDate = d3.timeFormat("%b %y");
 
                 const sliderSvg = d3
                     .select("#slider")
@@ -295,7 +294,6 @@ d3.json(
 
                 const updateData = h => {
                     handle.attr('cx', x(h));
-                    console.log(formatDate(h));
                     updateBubbles(h);
                     // set selected values in picker elements
                     d3.select('#yearSelect').property('value', h.getFullYear());
@@ -306,9 +304,6 @@ d3.json(
                 /* ==================================================== */
                 /*                     TIME-PICKER                      */
                 /* ==================================================== */
-
-                const years = [...new Set(rows.map(d => d.year))];
-                const months = [... new Set(rows.map(d => d.month))];
 
                 const onSelectChange = () => {
                     selectedYear = d3.select('#yearSelect').property('value');
