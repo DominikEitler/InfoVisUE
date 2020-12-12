@@ -315,6 +315,11 @@ d3.json(
                     updateData(selectedTime);
                 }
 
+                const monthLabel = d3.select('#timePicker')
+                    .append('text')
+                    .attr('class', 'label')
+                    .text("Month:")
+
                 const monthPicker = d3.select('#timePicker')
                     .append('select')
                     .attr('class', 'select')
@@ -326,6 +331,11 @@ d3.json(
                     .data(months).enter()
                     .append('option')
                     .text((d) => d);
+
+                const yearLabel = d3.select('#timePicker')
+                    .append('text')
+                    .attr('class', 'label')
+                    .text("Year:")
 
                 const yearPicker = d3.select("#timePicker")
                     .append('select')
