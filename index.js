@@ -1,5 +1,5 @@
-const height = window.innerHeight - 250;
-const sliderWidth = window.innerWidth - 200;
+const mapHeight = Math.min(window.innerHeight - 250, 700);
+const sliderWidth = Math.min(window.innerWidth - 200, 1500);
 const mapWidth = 750;
 const margin = { right: 50, left: 50 };
 
@@ -66,7 +66,7 @@ d3.json(
             .geoConicConformal()
             .parallels([37 + 4 / 60, 38 + 26 / 60])
             .rotate([120 + 30 / 60], 0)
-            .fitSize([mapWidth, height], mapFrameGeoJSON);
+            .fitSize([mapWidth, mapHeight], mapFrameGeoJSON);
 
 
         // function which is called on zoom events to transform the displayed map area
@@ -83,7 +83,7 @@ d3.json(
                     .scaleExtent([1, 18])
                     .translateExtent([
                         [0, 0],
-                        [mapWidth, height],
+                        [mapWidth, mapHeight],
                     ])
             );
         }
@@ -100,7 +100,7 @@ d3.json(
                 oxygen: +r['Oxygen'],
                 year: +r['year'],
                 month: +r['month'],
-                date: new Date(+r['year'], +r['month'])
+                date: new Date(+r['year'], +r['month'] - 1)
             }))
             .get((error, rows) => {
                 // general values from data
@@ -108,7 +108,7 @@ d3.json(
                 const maxDate = new Date(Math.max.apply(null, rows.map(r => r.date)));
                 const minDate = new Date(Math.min.apply(null, rows.map(r => r.date)));
 
-                const startDate = minDate;
+                const startDate = maxDate;
 
                 const years = [...new Set(rows.map(d => d.year))];
                 const months = [... new Set(rows.map(d => d.month))];
@@ -128,7 +128,7 @@ d3.json(
                     .select('#map')
                     .append('svg')
                     .attr('width', mapWidth)
-                    .attr('height', height)
+                    .attr('height', mapHeight)
                     .call(zoom);
 
                 // map layer group
@@ -137,7 +137,7 @@ d3.json(
                 // background
                 g.append('rect')
                     .attr('width', mapWidth)
-                    .attr('height', height)
+                    .attr('height', mapHeight)
                     .attr('x', 0)
                     .attr('y', 0)
                     .attr('fill', greys[1]);
@@ -216,7 +216,7 @@ d3.json(
 
                 const mousemove = d => {
                     Tooltip.html(
-                        `Station  ${Math.floor(d.id)} ${d.name !== '' ? '- ' +  d.name : ''} <br>
+                        `Station  ${Math.floor(d.id)} ${d.name !== '' ? '- ' + d.name : ''} <br>
                         Oxygen: ${d.oxygen}%`
                     )
                         .style('left', `${d3.event.pageX + 10}px`)
@@ -250,13 +250,13 @@ d3.json(
                         .on('mouseleave', mouseleave);
                 }
 
-                // initial setting of the bubbles
-                updateBubbles(startDate);
-
 
                 /* ==================================================== */
                 /*                        SLIDER                        */
                 /* ==================================================== */
+
+                // Parts of the code regarding the slider are based on the following snippet: 
+                // https://www.d3-graph-gallery.com/graph/density_slider.html
 
                 // time format used for the ticks on the slider
                 const formatDate = d3.timeFormat("%b %y");
@@ -272,10 +272,6 @@ d3.json(
                     .domain([minDate, maxDate])
                     .range([0, sliderWidth - margin.left - margin.right])
                     .clamp(true);
-
-                // initial value
-                const startValue = x(startDate);
-                startingValue = startDate;
 
                 const slider = sliderSvg.append("g")
                     .attr("class", "slider")
@@ -324,7 +320,7 @@ d3.json(
                 const onSelectChange = () => {
                     selectedYear = d3.select('#yearSelect').property('value');
                     selectedMonth = d3.select('#monthSelect').property('value');
-                    selectedTime = new Date(selectedYear, selectedMonth - 1);
+                    selectedTime = new Date(selectedYear, selectedMonth);
                     updateData(selectedTime);
                 }
 
@@ -363,6 +359,9 @@ d3.json(
                     .data(years).enter()
                     .append('option')
                     .text((d) => d);
+
+                // set initial values
+                updateData(startDate);
 
             });
 
