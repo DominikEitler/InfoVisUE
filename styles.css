@@ -1,3 +1,22 @@
+body {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+h1 {
+  margin-bottom: 10px;
+}
+
+p {
+  margin-top: 0;
+  margin-bottom: 5px;
+}
+
+#map {
+  border: 2px lightgray solid;
+}
+
 .ticks {
   font: 10px sans-serif;
     }

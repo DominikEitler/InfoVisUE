@@ -1,8 +1,9 @@
-const height = window.innerHeight - 150;
-const width = window.innerWidth - 200;
+const height = window.innerHeight - 250;
+const sliderWidth = window.innerWidth - 200;
+const mapWidth = 750;
 const margin = { right: 50, left: 50 };
 
-const labelSize = 7;
+const labelSize = 9;
 const markerSize = 1.5;
 const bubbleSize = 10;
 let lastZoom = 1
@@ -57,7 +58,7 @@ d3.json(
             .geoConicConformal()
             .parallels([37 + 4 / 60, 38 + 26 / 60])
             .rotate([120 + 30 / 60], 0)
-            .fitSize([width, height], mapFrameGeoJSON);
+            .fitSize([mapWidth, height], mapFrameGeoJSON);
 
         const zoom = s => {
             s.call(
@@ -72,7 +73,7 @@ d3.json(
                     .scaleExtent([1, 18])
                     .translateExtent([
                         [0, 0],
-                        [width, height],
+                        [mapWidth, height],
                     ])
             );
         }
@@ -91,6 +92,8 @@ d3.json(
                 date: new Date(+r['year'], +r['month'])
             }))
             .get((error, rows) => {
+                // const sD = new Date(2010, 1);
+                // rows = rows.filter(r => r.date > sD);
 
                 // general values from data
 
@@ -116,7 +119,7 @@ d3.json(
                 const mapSvg = d3
                     .select('#map')
                     .append('svg')
-                    .attr('width', width)
+                    .attr('width', mapWidth)
                     .attr('height', height)
                     .call(zoom);
 
@@ -125,7 +128,7 @@ d3.json(
 
                 // background
                 g.append('rect')
-                    .attr('width', width)
+                    .attr('width', mapWidth)
                     .attr('height', height)
                     .attr('x', 0)
                     .attr('y', 0)
@@ -249,13 +252,13 @@ d3.json(
                 const sliderSvg = d3
                     .select("#slider")
                     .append('svg')
-                    .attr('width', width)
+                    .attr('width', sliderWidth)
                     .attr('height', 60);
 
                 // scale function
                 const x = d3.scaleTime()
                     .domain([minDate, maxDate])
-                    .range([0, width - margin.left - margin.right])
+                    .range([0, sliderWidth - margin.left - margin.right])
                     .clamp(true);
 
                 // initial value
@@ -282,7 +285,7 @@ d3.json(
                     .attr("class", "ticks")
                     .attr("transform", `translate(0, ${18})`)
                     .selectAll("text")
-                    .data(x.ticks(10))
+                    .data(x.ticks(20))
                     .enter().append("text")
                     .attr("x", x)
                     .attr("text-anchor", "middle")
