@@ -84,6 +84,7 @@ d3.json(
         d3.csv("oxygen.csv")
             .row(r => ({
                 id: r['Station_Number'],
+                name: r['Station_Name'],
                 lat: +r['Lat'],
                 long: +r['Lng'],
                 oxygen: +r['Oxygen'],
@@ -208,7 +209,7 @@ d3.json(
 
                 const mousemove = d => {
                     Tooltip.html(
-                        `Station  ${Math.floor(d.id)} <br>
+                        `Station  ${Math.floor(d.id)} - ${d.name} <br>
                         Oxygen: ${d.oxygen}%`
                     )
                         .style('left', `${d3.event.pageX + 10}px`)
