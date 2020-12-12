@@ -217,7 +217,7 @@ d3.json(
                 const mousemove = d => {
                     Tooltip.html(
                         `Station  ${Math.floor(d.id)} ${d.name !== '' ? '- ' + d.name : ''} <br>
-                        Oxygen: ${d.oxygen}%`
+                        Oxygen: ${d.oxygen}mg/l`
                     )
                         .style('left', `${d3.event.pageX + 10}px`)
                         .style('top', `${d3.event.pageY + 2}px`);
