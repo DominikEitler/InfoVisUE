@@ -93,9 +93,6 @@ d3.json(
                 date: new Date(+r['year'], +r['month'])
             }))
             .get((error, rows) => {
-                // const sD = new Date(2010, 1);
-                // rows = rows.filter(r => r.date > sD);
-
                 // general values from data
 
                 const maxDate = new Date(Math.max.apply(null, rows.map(r => r.date)));
