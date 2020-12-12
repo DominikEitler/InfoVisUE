@@ -17,6 +17,11 @@ const compareDates = (date1, date2) => date1.getMonth() == date2.getMonth() && d
 // import map data
 d3.json(
     // map data based on OpenStreetMap and the U.S. Census Bureau, uses the "California State Plane III feet" projection (EPSG: 2227)
+
+    // Parts of this code regarding the map of the San Francisco Bay Area are based
+    // on a Observable Notebook by Chris Henrick: https://observablehq.com/@clhenrick/sf-bay-area-basemap-cropped, last accessed 12.12.2020
+
+
     'https://gist.githubusercontent.com/clhenrick/4ebb009378a9ede30d3db672caeb9ff5/raw/bda4918592ff5e089ee4deb6650c4e5d70adb994/basemap_layers.json',
     function (basemapTopoJson) {
         // merge each county to create one contiguous land area
