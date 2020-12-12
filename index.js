@@ -84,6 +84,7 @@ d3.json(
         d3.csv("oxygen.csv")
             .row(r => ({
                 id: r['Station_Number'],
+                name: r['Station_Name'],
                 lat: +r['Lat'],
                 long: +r['Lng'],
                 oxygen: +r['Oxygen'],
@@ -208,7 +209,7 @@ d3.json(
 
                 const mousemove = d => {
                     Tooltip.html(
-                        `Station  ${Math.floor(d.id)} <br>
+                        `Station  ${Math.floor(d.id)} ${d.name !== '' ? '- ' +  d.name : ''} <br>
                         Oxygen: ${d.oxygen}%`
                     )
                         .style('left', `${d3.event.pageX + 10}px`)
@@ -315,6 +316,11 @@ d3.json(
                     updateData(selectedTime);
                 }
 
+                const monthLabel = d3.select('#timePicker')
+                    .append('text')
+                    .attr('class', 'label')
+                    .text("Month:")
+
                 const monthPicker = d3.select('#timePicker')
                     .append('select')
                     .attr('class', 'select')
@@ -326,6 +332,11 @@ d3.json(
                     .data(months).enter()
                     .append('option')
                     .text((d) => d);
+
+                const yearLabel = d3.select('#timePicker')
+                    .append('text')
+                    .attr('class', 'label')
+                    .text("Year:")
 
                 const yearPicker = d3.select("#timePicker")
                     .append('select')
