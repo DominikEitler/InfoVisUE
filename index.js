@@ -16,18 +16,22 @@ const compareDates = (date1, date2) => date1.getMonth() == date2.getMonth() && d
 
 // import map data
 d3.json(
+    // map data based on OpenStreetMap and the U.S. Census Bureau, uses the "California State Plane III feet" projection (EPSG: 2227)
     'https://gist.githubusercontent.com/clhenrick/4ebb009378a9ede30d3db672caeb9ff5/raw/bda4918592ff5e089ee4deb6650c4e5d70adb994/basemap_layers.json',
     function (basemapTopoJson) {
+        // merge each county to create one contiguous land area
         const landArea = topojson.merge(
             basemapTopoJson,
             basemapTopoJson.objects['county_boundaries'].geometries
         );
+
+        // extract the geographical data for cities from the dataset
         const places = topojson.feature(
             basemapTopoJson,
             basemapTopoJson.objects.osm_cities_towns
         );
 
-        // map cropping / bounding box
+        // crop the map and create a bounding box
         const mapFrameSpec = () => {
             const spec = {
                 width: 334,
@@ -43,7 +47,6 @@ d3.json(
         };
 
         // longitude, latitude for map frame / bounding box
-
         const mapFrameGeoJSON = {
             type: "Feature",
             geometry: {
@@ -60,6 +63,8 @@ d3.json(
             .rotate([120 + 30 / 60], 0)
             .fitSize([mapWidth, height], mapFrameGeoJSON);
 
+
+        // function which is called on zoom events to transform the displayed map area
         const zoom = s => {
             s.call(
                 d3.zoom()
@@ -218,6 +223,8 @@ d3.json(
                 /*                        BUBBLES                       */
                 /* ==================================================== */
 
+                // function to update the displayed bubbles on the map
+                // extracts values from the data and maps each value to the respective color saturation
                 const updateBubbles = date => {
                     const markers = rows.filter(r => compareDates(r.date, date));
 
@@ -238,6 +245,7 @@ d3.json(
                         .on('mouseleave', mouseleave);
                 }
 
+                // initial setting of the bubbles
                 updateBubbles(startDate);
 
 
@@ -245,6 +253,7 @@ d3.json(
                 /*                        SLIDER                        */
                 /* ==================================================== */
 
+                // time format used for the ticks on the slider
                 const formatDate = d3.timeFormat("%b %y");
 
                 const sliderSvg = d3
@@ -306,13 +315,15 @@ d3.json(
                 /*                     TIME-PICKER                      */
                 /* ==================================================== */
 
+                // the selection of the date should update the bubbles and and the slider position
                 const onSelectChange = () => {
                     selectedYear = d3.select('#yearSelect').property('value');
                     selectedMonth = d3.select('#monthSelect').property('value');
-                    selectedTime = new Date(selectedYear, selectedMonth - 1); //TODO why is this 1 month off?
+                    selectedTime = new Date(selectedYear, selectedMonth - 1);
                     updateData(selectedTime);
                 }
 
+                // month picker
                 const monthLabel = d3.select('#timePicker')
                     .append('text')
                     .attr('class', 'label')
@@ -330,6 +341,7 @@ d3.json(
                     .append('option')
                     .text((d) => d);
 
+                // year picker
                 const yearLabel = d3.select('#timePicker')
                     .append('text')
                     .attr('class', 'label')
