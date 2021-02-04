@@ -2,6 +2,12 @@
 Group 3 (Eitler Dominik & Irendorfer Max)  
 12.12.2020
 
+## Information
+This is a project for the course "Informationsvisualisierung UE" (Winter semester 2020) at TU Wien.
+The dataset originates from https://sfbay.wr.usgs.gov/access/wqdata/index.html.
+
+## Description for sumbission
+
 Used Libraries (Preprocessing):
 - python numpy
 - python pandas
